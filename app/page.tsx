@@ -105,11 +105,16 @@ export default function Home() {
       : "Ilona's Interior Design Critic";
 
     const opt = {
-      margin: [15, 15, 15, 15],
+      margin: [12, 15, 12, 15],
       filename: `${title.replace(/[^a-zA-Z0-9äöüÄÖÜß\s-]/g, "").replace(/\s+/g, "-")}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#f5f0eb",
+      },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
     // Create a wrapper with the title styled to match
@@ -149,6 +154,21 @@ export default function Home() {
     wrapper.appendChild(header);
 
     const contentClone = el.cloneNode(true) as HTMLElement;
+
+    // Add page-break-inside: avoid to each section so they don't split
+    const sections = contentClone.querySelectorAll(":scope > div > div");
+    sections.forEach((section) => {
+      (section as HTMLElement).style.pageBreakInside = "avoid";
+      (section as HTMLElement).style.breakInside = "avoid";
+    });
+
+    // Also prevent breaks inside prose blocks and the score section
+    const proseBlocks = contentClone.querySelectorAll(".prose, [class*='score']");
+    proseBlocks.forEach((block) => {
+      (block as HTMLElement).style.pageBreakInside = "avoid";
+      (block as HTMLElement).style.breakInside = "avoid";
+    });
+
     wrapper.appendChild(contentClone);
 
     // Footer: "Analysis by Ilona Socolov"
