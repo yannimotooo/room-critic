@@ -6,9 +6,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) {
-    return new Response("ANTHROPIC_API_KEY is not set. Add it to .env.local", {
-      status: 500,
-    });
+    return new Response("ANTHROPIC_API_KEY is not set", { status: 500 });
   }
 
   try {
@@ -42,36 +40,12 @@ export async function POST(req: Request) {
       ],
     });
 
-    return createTextStreamResponse(result.textStream);
+    // Use the SDK's built-in text stream response
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("Analysis error:", error);
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";
     return new Response(`Analysis failed: ${message}`, { status: 500 });
   }
-}
-
-function createTextStreamResponse(stream: ReadableStream<string>): Response {
-  const encoder = new TextEncoder();
-  const readable = new ReadableStream({
-    async start(controller) {
-      const reader = stream.getReader();
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          controller.enqueue(encoder.encode(value));
-        }
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(readable, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Transfer-Encoding": "chunked",
-    },
-  });
 }
