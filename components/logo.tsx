@@ -1,18 +1,13 @@
 export default function Logo({ className = "" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 320 80"
+      viewBox="0 0 185 80"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-label="Ilona Socolov — Interior | Architektur"
     >
       {/* Top-left corner bracket */}
-      <path
-        d="M2 0 L2 2 L0 2 L0 0 Z"
-        fill="currentColor"
-        transform="translate(0, 0)"
-      />
       <rect x="0" y="0" width="3" height="28" fill="currentColor" />
       <rect x="0" y="0" width="22" height="3" fill="currentColor" />
 
@@ -47,25 +42,6 @@ export default function Logo({ className = "" }: { className?: string }) {
         <tspan dx="6" opacity="0.6">|</tspan>
         <tspan dx="6">Architektur</tspan>
       </text>
-
-      {/* Small green accent square */}
-      <rect
-        x="195"
-        y="22"
-        width="18"
-        height="18"
-        rx="0"
-        fill="#b8cc3c"
-        opacity="0.85"
-      />
-      <rect
-        x="200"
-        y="27"
-        width="8"
-        height="8"
-        rx="0"
-        fill="white"
-      />
     </svg>
   );
 }

@@ -205,11 +205,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-3 shrink-0">
-            <Logo className="h-12 sm:h-14 w-auto text-foreground" />
-
-            {/* Language toggle */}
-            <div className="flex border-3 border-foreground">
+          {/* Language toggle */}
+          <div className="flex border-3 border-foreground shrink-0">
             <button
               onClick={() => setLang("de")}
               className={`px-3 py-1.5 text-xs font-bold tracking-widest transition-colors ${
@@ -230,7 +227,6 @@ export default function Home() {
             >
               EN
             </button>
-            </div>
           </div>
         </div>
       </header>
@@ -317,6 +313,10 @@ export default function Home() {
             </div>
           </div>
         )}
+        {/* Logo at the bottom — flows down with content */}
+        <div className="mt-12 pt-8 border-t border-foreground/10 flex justify-center">
+          <Logo className="h-14 w-auto text-foreground/30" />
+        </div>
       </main>
     </div>
   );
