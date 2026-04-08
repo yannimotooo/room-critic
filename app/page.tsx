@@ -195,11 +195,21 @@ export default function Home() {
       <header className="w-full border-b-3 border-foreground">
         <div className="max-w-3xl mx-auto px-6 py-8 flex items-start justify-between gap-4">
           <div>
-            <Logo className="h-16 sm:h-20 w-auto text-foreground" />
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-none">
+              ILONA&apos;S INTERIOR
+              <br />
+              DESIGN CRITIC
+            </h1>
+            <p className="mt-2 text-sm font-medium tracking-widest uppercase text-muted">
+              {t.tagline}
+            </p>
           </div>
 
-          {/* Language toggle */}
-          <div className="flex border-3 border-foreground shrink-0">
+          <div className="flex flex-col items-end gap-3 shrink-0">
+            <Logo className="h-12 sm:h-14 w-auto text-foreground" />
+
+            {/* Language toggle */}
+            <div className="flex border-3 border-foreground">
             <button
               onClick={() => setLang("de")}
               className={`px-3 py-1.5 text-xs font-bold tracking-widest transition-colors ${
@@ -220,6 +230,7 @@ export default function Home() {
             >
               EN
             </button>
+            </div>
           </div>
         </div>
       </header>
