@@ -151,6 +151,19 @@ export default function Home() {
     const contentClone = el.cloneNode(true) as HTMLElement;
     wrapper.appendChild(contentClone);
 
+    // Footer: "Analysis by Ilona Socolov"
+    const footer = document.createElement("div");
+    footer.style.borderTop = "2px solid #111";
+    footer.style.marginTop = "32px";
+    footer.style.paddingTop = "12px";
+    footer.style.fontSize = "11px";
+    footer.style.fontWeight = "600";
+    footer.style.letterSpacing = "2px";
+    footer.style.textTransform = "uppercase";
+    footer.style.color = "#888";
+    footer.textContent = "Analysis by Ilona Socolov";
+    wrapper.appendChild(footer);
+
     html2pdf().set(opt).from(wrapper).save();
   }, [roomName]);
 
