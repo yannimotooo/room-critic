@@ -75,10 +75,31 @@ export default function Home() {
           onReset={handleReset}
         />
 
-        {hasUploaded && (
+        {/* Loading state */}
+        {isLoading && !content && (
+          <div className="mt-8 border-t-3 border-foreground pt-8">
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1">
+                <div className="w-3 h-3 bg-foreground animate-pulse" />
+                <div className="w-3 h-3 bg-foreground animate-pulse [animation-delay:150ms]" />
+                <div className="w-3 h-3 bg-foreground animate-pulse [animation-delay:300ms]" />
+              </div>
+              <span className="text-sm font-bold tracking-widest uppercase">
+                Analyzing your room
+              </span>
+            </div>
+            <p className="mt-3 text-xs text-muted tracking-wide">
+              Evaluating color palette, design style, lighting, spatial layout, and preparing suggestions. This takes 10-20 seconds.
+            </p>
+          </div>
+        )}
+
+        {/* Streamed results */}
+        {hasUploaded && content && (
           <AnalysisStream content={content} isStreaming={isLoading} />
         )}
 
+        {/* Feature grid (before upload) */}
         {!hasUploaded && (
           <div className="mt-12 border-t-2 border-foreground/10 pt-8">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs font-bold tracking-widest uppercase text-muted">
@@ -104,7 +125,6 @@ export default function Home() {
           </div>
         )}
       </main>
-
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { resizeImage } from "@/lib/resize-image";
 
 interface UploadZoneProps {
   onUpload: (base64: string, mimeType: string) => void;
@@ -16,7 +17,7 @@ const ACCEPTED_TYPES = [
   "image/heif",
 ];
 const ACCEPTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"];
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB (pre-resize)
 
 export default function UploadZone({
   onUpload,
@@ -26,10 +27,11 @@ export default function UploadZone({
   const [preview, setPreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
 
       const ext = "." + file.name.split(".").pop()?.toLowerCase();
@@ -39,25 +41,31 @@ export default function UploadZone({
       }
 
       if (file.size > MAX_SIZE) {
-        setError("FILE TOO LARGE. MAX 10MB.");
+        setError("FILE TOO LARGE. MAX 20MB.");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setPreview(result);
-        // Extract base64 data (remove data:image/...;base64, prefix)
-        const base64 = result.split(",")[1];
-        // HEIC files often report wrong mime type in browsers
-        let mime = file.type;
-        if (!mime || mime === "application/octet-stream") {
-          const ext = file.name.split(".").pop()?.toLowerCase();
-          if (ext === "heic" || ext === "heif") mime = "image/heic";
-        }
-        onUpload(base64, mime);
-      };
-      reader.readAsDataURL(file);
+      setProcessing(true);
+
+      try {
+        // Read file as data URL
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsDataURL(file);
+        });
+
+        setPreview(dataUrl);
+
+        // Resize and compress to stay under Vercel body limit
+        const { base64, mimeType } = await resizeImage(dataUrl);
+        onUpload(base64, mimeType);
+      } catch {
+        setError("FAILED TO PROCESS IMAGE. TRY ANOTHER FILE.");
+      } finally {
+        setProcessing(false);
+      }
     },
     [onUpload]
   );
@@ -73,7 +81,7 @@ export default function UploadZone({
   );
 
   const handleClick = () => {
-    if (!preview && !isAnalyzing) {
+    if (!preview && !isAnalyzing && !processing) {
       inputRef.current?.click();
     }
   };
@@ -108,7 +116,7 @@ export default function UploadZone({
               alt="Uploaded room"
               className="w-full max-h-[500px] object-contain bg-black"
             />
-            {!isAnalyzing && (
+            {!isAnalyzing && !processing && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -132,12 +140,6 @@ export default function UploadZone({
             >
               or click to select
             </div>
-          </div>
-        )}
-
-        {isAnalyzing && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-surface overflow-hidden">
-            <div className="h-full bg-foreground animate-pulse w-full" />
           </div>
         )}
       </div>
