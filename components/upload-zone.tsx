@@ -15,6 +15,7 @@ const ACCEPTED_TYPES = [
   "image/heic",
   "image/heif",
 ];
+const ACCEPTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
 export default function UploadZone({
@@ -31,8 +32,9 @@ export default function UploadZone({
     (file: File) => {
       setError(null);
 
-      if (!ACCEPTED_TYPES.includes(file.type)) {
-        setError("UNSUPPORTED FORMAT. USE JPG, PNG, OR WEBP.");
+      const ext = "." + file.name.split(".").pop()?.toLowerCase();
+      if (!ACCEPTED_TYPES.includes(file.type) && !ACCEPTED_EXTENSIONS.includes(ext)) {
+        setError("UNSUPPORTED FORMAT. USE JPG, PNG, WEBP, OR HEIC.");
         return;
       }
 
@@ -47,7 +49,13 @@ export default function UploadZone({
         setPreview(result);
         // Extract base64 data (remove data:image/...;base64, prefix)
         const base64 = result.split(",")[1];
-        onUpload(base64, file.type);
+        // HEIC files often report wrong mime type in browsers
+        let mime = file.type;
+        if (!mime || mime === "application/octet-stream") {
+          const ext = file.name.split(".").pop()?.toLowerCase();
+          if (ext === "heic" || ext === "heif") mime = "image/heic";
+        }
+        onUpload(base64, mime);
       };
       reader.readAsDataURL(file);
     },

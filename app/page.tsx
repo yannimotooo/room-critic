@@ -105,12 +105,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t-2 border-foreground/10">
-        <div className="max-w-3xl mx-auto px-6 py-4 text-xs text-muted tracking-wide">
-          Powered by Claude
-        </div>
-      </footer>
     </div>
   );
 }
