@@ -40,8 +40,32 @@ export async function POST(req: Request) {
       ],
     });
 
-    // Use the SDK's built-in text stream response
-    return result.toTextStreamResponse();
+    // Await the first chunk to catch auth/billing errors before streaming
+    // The SDK throws errors lazily during streaming, so we need to
+    // consume at least one chunk to surface them
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of result.textStream) {
+            controller.enqueue(encoder.encode(chunk));
+          }
+          controller.close();
+        } catch (error) {
+          const msg =
+            error instanceof Error ? error.message : "Unknown error";
+          // If nothing has been sent yet, we can still write an error
+          controller.enqueue(
+            encoder.encode(`\n\n## ERROR\n\n${msg}`)
+          );
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readable, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   } catch (error) {
     console.error("Analysis error:", error);
     const message =
