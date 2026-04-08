@@ -9,7 +9,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "ROOM CRITIC — Interior Design Review",
+  title: "ILONA'S INTERIOR DESIGN CRITIC",
   description:
     "Upload a room photo. Get a brutally honest interior design critique powered by AI.",
 };

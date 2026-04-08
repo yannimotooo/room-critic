@@ -1,6 +1,6 @@
 import { streamText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
-import { SYSTEM_PROMPT, USER_PROMPT } from "@/lib/prompts";
+import { getSystemPrompt, getUserPrompt } from "@/lib/prompts";
 
 export const maxDuration = 60;
 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { image, mimeType } = await req.json();
+    const { image, mimeType, lang = "de" } = await req.json();
 
     if (!image || !mimeType) {
       return new Response("Missing image or mimeType in request body", {
@@ -20,9 +20,11 @@ export async function POST(req: Request) {
 
     const dataUrl = `data:${mimeType};base64,${image}`;
 
+    const language = lang === "en" ? "en" : "de";
+
     const result = streamText({
       model: anthropic("claude-sonnet-4-6"),
-      system: SYSTEM_PROMPT,
+      system: getSystemPrompt(language),
       messages: [
         {
           role: "user",
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
             },
             {
               type: "text",
-              text: USER_PROMPT,
+              text: getUserPrompt(language),
             },
           ],
         },
