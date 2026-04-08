@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import UploadZone from "@/components/upload-zone";
 import AnalysisStream from "@/components/analysis-stream";
+import Logo from "@/components/logo";
 
 type Lang = "de" | "en";
 
@@ -105,7 +106,7 @@ export default function Home() {
       : "Ilona's Interior Design Critic";
 
     const opt = {
-      margin: [12, 15, 12, 15],
+      margin: 0,
       filename: `${title.replace(/[^a-zA-Z0-9äöüÄÖÜß\s-]/g, "").replace(/\s+/g, "-")}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -117,12 +118,13 @@ export default function Home() {
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    // Create a wrapper with the title styled to match
+    // Create a wrapper — padding is inside the element so the background
+    // fills the entire page with no white border
     const wrapper = document.createElement("div");
     wrapper.style.fontFamily = "'Space Grotesk', system-ui, sans-serif";
     wrapper.style.color = "#111";
     wrapper.style.background = "#f5f0eb";
-    wrapper.style.padding = "20px";
+    wrapper.style.padding = "40px 35px";
 
     const header = document.createElement("div");
     header.style.borderBottom = "3px solid #111";
@@ -193,14 +195,7 @@ export default function Home() {
       <header className="w-full border-b-3 border-foreground">
         <div className="max-w-3xl mx-auto px-6 py-8 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-none">
-              ILONA&apos;S INTERIOR
-              <br />
-              DESIGN CRITIC
-            </h1>
-            <p className="mt-2 text-sm font-medium tracking-widest uppercase text-muted">
-              {t.tagline}
-            </p>
+            <Logo className="h-16 sm:h-20 w-auto text-foreground" />
           </div>
 
           {/* Language toggle */}
